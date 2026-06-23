@@ -4,6 +4,7 @@ import { useCallback, useId, useState } from "react";
 
 interface SliderInputProps {
   label: string;
+  helperText?: string;
   value: number;
   min: number;
   max: number;
@@ -28,6 +29,7 @@ export default function SliderInput({
   suffix,
   minLabel,
   maxLabel,
+  helperText,
   accentColor = "var(--color-principal)",
 }: SliderInputProps) {
   const inputId = useId();
@@ -83,15 +85,22 @@ export default function SliderInput({
   return (
     <div className="flex flex-col gap-2.5">
       <div className="flex items-center justify-between gap-3">
-        <label
-          htmlFor={inputId}
-          className="text-[0.8rem] font-semibold text-[var(--color-text-secondary)] tracking-[0.01em]"
-        >
-          {label}
-        </label>
+        <div className="flex flex-col">
+          <label
+            htmlFor={inputId}
+            className="text-[0.9rem] font-bold text-[var(--color-text-primary)] tracking-[0.01em]"
+          >
+            {label}
+          </label>
+          {helperText && (
+            <p className="text-[0.7rem] text-[var(--color-text-muted)] mt-1 max-w-[200px] leading-snug">
+              {helperText}
+            </p>
+          )}
+        </div>
 
         <div
-          className="flex items-center gap-1 bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-[10px] px-3 py-1.5 transition-all duration-200 focus-within:border-[var(--color-principal)] focus-within:shadow-[0_0_0_3px_var(--color-principal-light)]"
+          className="flex items-center gap-1.5 bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-[12px] px-3.5 py-2 transition-all duration-200 focus-within:border-[var(--color-principal)] focus-within:shadow-[0_0_0_4px_var(--color-principal-light)]"
         >
           {prefix && (
             <span className="text-[0.8rem] text-[var(--color-text-muted)] select-none">
@@ -108,7 +117,8 @@ export default function SliderInput({
             onChange={handleNumberChange}
             onFocus={handleNumberFocus}
             onBlur={handleNumberBlur}
-            className="w-20 bg-transparent border-none outline-none text-[0.875rem] font-bold text-[var(--color-text-primary)] text-right font-[inherit] appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            placeholder={String(value)}
+            className="w-20 bg-transparent border-none outline-none text-[1rem] font-extrabold text-[var(--color-principal)] text-right font-[inherit] appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             aria-label={label}
           />
           {suffix && (
@@ -119,9 +129,9 @@ export default function SliderInput({
         </div>
       </div>
 
-      <div className="relative py-0.5">
+      <div className="relative py-1 mt-2">
         <div
-          className="absolute top-1/2 left-0 h-[3px] rounded-full -translate-y-1/2 pointer-events-none transition-[width] duration-[50ms] ease-out"
+          className="absolute top-1/2 left-0 h-[6px] rounded-full -translate-y-1/2 pointer-events-none transition-[width] duration-[50ms] ease-out"
           style={{
             width: `${fillPercent}%`,
             background: accentColor,
@@ -140,11 +150,11 @@ export default function SliderInput({
         />
       </div>
 
-      <div className="flex justify-between">
-        <span className="text-[0.7rem] text-[var(--color-text-muted)]">
+      <div className="flex justify-between mt-1">
+        <span className="text-[0.75rem] font-medium text-[var(--color-text-muted)]">
           {minLabel ?? String(min)}
         </span>
-        <span className="text-[0.7rem] text-[var(--color-text-muted)]">
+        <span className="text-[0.75rem] font-medium text-[var(--color-text-muted)]">
           {maxLabel ?? String(max)}
         </span>
       </div>

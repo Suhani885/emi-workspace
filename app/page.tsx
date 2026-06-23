@@ -102,6 +102,15 @@ function SunIcon() {
   );
 }
 
+function UndoIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7v6h6" />
+      <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
+    </svg>
+  );
+}
+
 function MoonIcon() {
   return (
     <svg
@@ -163,31 +172,54 @@ export default function Page() {
         <div className="flex items-center gap-2.5">
           <TabIndicator />
 
-          <button
-            onClick={() =>
-              dispatch({
-                type: "SET_THEME",
-                payload: theme === "light" ? "dark" : "light",
-              })
-            }
-            className="w-9 h-9 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 ease-in hover:border-[var(--color-principal)] hover:text-[var(--color-principal)] shrink-0"
-            aria-label="Toggle theme"
-          >
-            {theme === "light" ? <MoonIcon /> : <SunIcon />}
-          </button>
+          <div className="relative group flex items-center justify-center">
+            <button
+              onClick={() => dispatch({ type: "UNDO" })}
+              disabled={!state.past || state.past.length === 0}
+              className={`w-9 h-9 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-bg-card)] cursor-pointer flex items-center justify-center transition-all duration-200 shrink-0 ${
+                !state.past || state.past.length === 0
+                  ? "opacity-50 cursor-not-allowed text-[var(--color-text-muted)]"
+                  : "text-[var(--color-text-secondary)] hover:border-[var(--color-principal)] hover:text-[var(--color-principal)]"
+              }`}
+              aria-label="Undo last action"
+            >
+              <UndoIcon />
+            </button>
+            <div className="absolute top-full right-0 mt-2 px-2.5 py-1.5 bg-[var(--color-text-primary)] text-[var(--color-bg-base)] text-[0.75rem] font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg z-50">
+              Undo
+            </div>
+          </div>
+
+          <div className="relative group flex items-center justify-center">
+            <button
+              onClick={() =>
+                dispatch({
+                  type: "SET_THEME",
+                  payload: theme === "light" ? "dark" : "light",
+                })
+              }
+              className="w-9 h-9 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-secondary)] cursor-pointer flex items-center justify-center transition-all duration-200 ease-in hover:border-[var(--color-principal)] hover:text-[var(--color-principal)] shrink-0"
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? <MoonIcon /> : <SunIcon />}
+            </button>
+            <div className="absolute top-full right-0 mt-2 px-2.5 py-1.5 bg-[var(--color-text-primary)] text-[var(--color-bg-base)] text-[0.75rem] font-medium rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none whitespace-nowrap shadow-lg z-50">
+              Toggle theme
+            </div>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-[1400px] mx-auto py-7 px-4">
-        <div className="flex gap-1 p-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[14px] w-max max-w-full mb-7 overflow-x-auto scrollbar-hide">
+      <div className="max-w-[1200px] mx-auto py-6 px-4 md:px-6">
+        <div className="flex gap-1 p-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[14px] shadow-sm w-max max-w-full mb-6 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => dispatch({ type: "SET_MODE", payload: tab.id })}
-              className={`flex items-center gap-[7px] py-2 px-[14px] rounded-[10px] text-[0.7rem] font-semibold border-none cursor-pointer transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-[6px] py-2 px-[14px] rounded-[10px] text-[0.8rem] font-bold border-none cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] whitespace-nowrap shrink-0 ${
                 mode === tab.id
-                  ? "bg-[var(--color-principal)] text-white shadow-[0_4px_16px_var(--color-principal-glow)]"
-                  : "bg-transparent text-[var(--color-text-secondary)]"
+                  ? "bg-[var(--color-principal)] text-white shadow-[0_4px_16px_var(--color-principal-glow)] transform scale-105"
+                  : "bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-input)]"
               }`}
             >
               {tab.icon}
@@ -198,7 +230,7 @@ export default function Page() {
 
         {mode === "single" && (
           <div className="animate-fade-slide-up">
-            <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6 mb-6">
               <LoanInputs />
               <div className="flex flex-col gap-6">
                 <SummaryCards />

@@ -13,7 +13,7 @@ interface PrepaymentFormState {
   amount: string;
 }
 
-const EMPTY_FORM: PrepaymentFormState = { month: "", amount: "" };
+const EMPTY_FORM: PrepaymentFormState = { month: "1", amount: "50000" };
 
 function formatTenure(months: number): string {
   const y = Math.floor(months / 12);

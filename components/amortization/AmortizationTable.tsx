@@ -73,16 +73,6 @@ export default function AmortizationTable({
 
   return (
     <div className="flex flex-col gap-0">
-      <div className="flex justify-end mb-3">
-        <button
-          onClick={handleExport}
-          className="flex items-center gap-1.5 py-1.5 px-3.5 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-secondary)] text-[0.75rem] font-semibold cursor-pointer font-[inherit] transition-all duration-200 hover:border-[var(--color-principal)] hover:text-[var(--color-principal)]"
-        >
-          <DownloadIcon />
-          Export CSV
-        </button>
-      </div>
-
       <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)]">
         <table className="w-full border-collapse text-[0.85rem]">
           <thead>
