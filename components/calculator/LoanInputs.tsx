@@ -36,7 +36,7 @@ export default function LoanInputs() {
   );
 
   return (
-    <div className="glass-card p-6 flex flex-col gap-6 relative overflow-hidden">
+    <div className="glass-card p-4 sm:p-6 flex flex-col gap-5 sm:gap-6 relative overflow-hidden">
       <div>
         <div className="flex items-center gap-3 mb-2">
           <div className="w-[36px] h-[36px] rounded-xl bg-[var(--color-principal-light)] flex items-center justify-center">

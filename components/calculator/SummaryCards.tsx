@@ -61,8 +61,7 @@ export default function SummaryCards() {
   ];
 
   return (
-    <div className="glass-card p-6 relative overflow-hidden">
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[var(--color-interest-light)] rounded-full blur-[120px] -ml-[200px] -mb-[200px] pointer-events-none opacity-60" />
+    <div className="glass-card p-4 sm:p-6">
       <div className="flex items-center gap-3">
         <div className="w-[36px] h-[36px] rounded-xl bg-[var(--color-principal-light)] flex items-center justify-center">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-principal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -74,13 +73,16 @@ export default function SummaryCards() {
         </h2>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 items-center justify-between mt-6">
-        <div className="w-[240px] h-[240px] shrink-0 relative mx-auto lg:mx-0">
+      <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 items-center justify-between mt-4 sm:mt-6 min-h-[260px] lg:min-h-[248px]">
+        <div className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] shrink-0 relative mx-auto lg:mx-0">
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
-            <span className="text-[0.75rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.1em] mb-1.5">
+            <span className="text-[0.65rem] sm:text-[0.75rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.1em] mb-1">
               Monthly EMI
             </span>
-            <span className="text-[1.5rem] font-extrabold text-[var(--color-text-primary)] tracking-tight">
+            <span
+              key={emi.toFixed(0)}
+              className="text-[1.2rem] sm:text-[1.5rem] font-extrabold text-[var(--color-text-primary)] tracking-tight animate-count-up"
+            >
               {formatINR(emi)}
             </span>
           </div>
@@ -91,8 +93,8 @@ export default function SummaryCards() {
                   data={donutData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={78}
-                  outerRadius={110}
+                  innerRadius="62%"
+                  outerRadius="88%"
                   paddingAngle={3}
                   dataKey="value"
                   startAngle={90}
@@ -118,7 +120,7 @@ export default function SummaryCards() {
               <p className="text-[0.65rem] text-[var(--color-text-muted)] mb-1">
                 (Principal + Interest)
               </p>
-              <p className="text-[1.7rem] font-extrabold text-[var(--color-text-primary)] tracking-tight">
+              <p className="text-[1.3rem] sm:text-[1.7rem] font-extrabold text-[var(--color-text-primary)] tracking-tight whitespace-nowrap tabular-nums">
                 {formatINR(totalPayable)}
               </p>
             </div>

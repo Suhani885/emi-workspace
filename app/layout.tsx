@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { AppProvider } from "@/context/AppProvider";
 import "./globals.css";
@@ -6,6 +6,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "EMI Workspace — Loan Calculator",
   description: "A premium Loan EMI Calculator with real-time cross-tab sync, amortization schedule, scenario comparison, and prepayment planner.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

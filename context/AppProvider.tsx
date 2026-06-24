@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useMemo, useEffect } from "react";
+import { useReducer, useMemo, useEffect, useRef } from "react";
 import { AppContext } from "./AppContext";
 import { reducer } from "./reducer";
 import { initialState } from "./initialState";
@@ -20,19 +20,22 @@ export function AppProvider({ children, initialTheme }: AppProviderProps) {
     theme: initialTheme ?? initialState.theme,
   });
 
-  const tabId = useTabId();
-  const channelRef = useBroadcast(state, dispatch, tabId);
-  const { activeTabs, isLeader } = usePresence(tabId, channelRef);
+  const { tabId, joinedAt } = useTabId();
+  const channelRef = useBroadcast(state, dispatch, tabId, joinedAt);
+  const { activeTabs, isLeader } = usePresence(tabId, joinedAt, channelRef);
+
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   useEffect(() => {
-    if (!channelRef.current || !isLeader) return;
+    if (!channelRef.current || !tabId) return;
 
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "LEADER_REQUEST" && event.data.tabId !== tabId) {
         channelRef.current?.postMessage({
           type: "STATE_UPDATE",
           tabId,
-          payload: state,
+          payload: stateRef.current,
         });
       }
     };
@@ -41,7 +44,7 @@ export function AppProvider({ children, initialTheme }: AppProviderProps) {
     return () => {
       channelRef.current?.removeEventListener("message", handleMessage);
     };
-  }, [isLeader, state, tabId, channelRef]);
+  }, [tabId, channelRef]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

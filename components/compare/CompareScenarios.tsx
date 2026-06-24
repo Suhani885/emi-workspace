@@ -186,7 +186,7 @@ export default function CompareScenarios() {
   }, [dispatch, scenarios.length, state.loan]);
 
   return (
-    <div className="glass-card p-7 flex flex-col gap-[22px]">
+    <div className="glass-card p-4 sm:p-7 flex flex-col gap-4 sm:gap-5.5">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
@@ -215,8 +215,13 @@ export default function CompareScenarios() {
       </div>
 
       {scenarios.length === 0 ? (
-        <div className="py-[60px] px-6 text-center text-[var(--color-text-muted)] text-[0.875rem] border-2 border-dashed border-[var(--color-border)] rounded-[14px]">
-          <div className="text-[2rem] mb-3">⚖️</div>
+        <div className="py-10 sm:py-15 px-4 sm:px-6 text-center text-[var(--color-text-muted)] text-[0.875rem] border-2 border-dashed border-[var(--color-border)] rounded-[14px]">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--color-interest-light)] flex items-center justify-center mx-auto mb-4">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-interest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 3L4 7v5c0 4.4 3.4 8.5 8 9.5 4.6-1 8-5.1 8-9.5V7l-8-4z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
           <p className="font-semibold text-[var(--color-text-secondary)] mb-1.5">
             No scenarios yet
           </p>

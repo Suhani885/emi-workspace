@@ -13,16 +13,6 @@ interface AmortizationTableProps {
 
 const ROWS_PER_PAGE = 12;
 
-function DownloadIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-      <polyline points="7 10 12 15 17 10"/>
-      <line x1="12" y1="15" x2="12" y2="3"/>
-    </svg>
-  );
-}
-
 export default function AmortizationTable({
   schedule,
   breakEvenMonth,
@@ -36,31 +26,6 @@ export default function AmortizationTable({
     return schedule.slice(start, start + ROWS_PER_PAGE);
   }, [schedule, page]);
 
-  const handleExport = () => {
-    const headers = ["Month", "EMI", "Principal", "Interest", showPrepayment ? "Prepayment" : "", "Balance"]
-      .filter(Boolean)
-      .join(",");
-    const rows = schedule.map((row) => {
-      const cols = [
-        row.month,
-        row.emi.toFixed(2),
-        row.principal.toFixed(2),
-        row.interest.toFixed(2),
-        showPrepayment ? row.prepayment.toFixed(2) : "",
-        row.balance.toFixed(2),
-      ].filter((_, i) => !(!showPrepayment && i === 4));
-      return cols.join(",");
-    });
-    const csv = [headers, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "amortization-schedule.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   if (schedule.length === 0) {
     return (
       <div className="py-12 px-6 text-center text-[var(--color-text-muted)] text-[0.875rem]">
@@ -69,76 +34,103 @@ export default function AmortizationTable({
     );
   }
 
-  const colClass = "py-2.5 px-3.5 text-right text-[0.8rem] font-medium text-[var(--color-text-muted)] whitespace-nowrap tracking-[0.04em] uppercase border-b border-[var(--color-border)]";
+  const colHeaderClass =
+    "py-3 px-3 text-right text-[0.7rem] font-bold text-[var(--color-text-muted)] whitespace-nowrap tracking-[0.05em] uppercase border-b border-[var(--color-border)] bg-[var(--color-bg-input)]";
 
   return (
     <div className="flex flex-col gap-0">
       <div className="overflow-x-auto rounded-2xl border border-[var(--color-border)]">
-        <table className="w-full border-collapse text-[0.85rem]">
+        <table className="w-full border-collapse text-[0.82rem]">
           <thead>
-            <tr className="bg-[var(--color-bg-input)]">
-              <th className={`${colClass} text-left pl-5 w-[90px] rounded-tl-2xl`}>
+            <tr>
+              <th className={`${colHeaderClass} text-center px-3 rounded-tl-2xl`}>
                 Month
               </th>
-              <th className={colClass}>EMI</th>
-              <th className={colClass}>Principal</th>
-              <th className={colClass}>Interest</th>
-              {showPrepayment && <th className={colClass}>Prepayment</th>}
-              <th className={`${colClass} pr-5 rounded-tr-2xl`}>Balance</th>
+              <th className={`${colHeaderClass} hidden sm:table-cell`}>EMI</th>
+              <th className={colHeaderClass}>Principal</th>
+              <th className={colHeaderClass}>Interest</th>
+              {showPrepayment && <th className={`${colHeaderClass} hidden md:table-cell`}>Prepayment</th>}
+              <th className={`${colHeaderClass} pr-4 sm:pr-5 rounded-tr-2xl`}>Balance</th>
             </tr>
           </thead>
 
           <tbody>
             {visibleRows.map((row, idx) => {
               const isBreakEven = row.month === breakEvenMonth;
-              const isEven = idx % 2 === 0;
+              const isFirstOfYear = row.month > 1 && (row.month - 1) % 12 === 0;
+              const yearNumber = Math.ceil(row.month / 12);
 
-              return (
+              return [
+                isFirstOfYear && (
+                  <tr key={`yr-${yearNumber}`}>
+                    <td
+                      colSpan={showPrepayment ? 6 : 5}
+                      className="px-4 sm:px-5 pt-3 pb-1"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-[0.66rem] font-extrabold text-[var(--color-text-muted)] uppercase tracking-[0.1em] whitespace-nowrap">
+                          Year {yearNumber}
+                        </span>
+                        <div className="flex-1 h-px bg-[var(--color-border)]" />
+                      </div>
+                    </td>
+                  </tr>
+                ),
+
                 <tr
                   key={row.month}
-                  className={`table-row-hover transition-colors duration-150 border-b border-[var(--color-border)] ${
+                  className={`border-b border-[var(--color-border)] transition-colors duration-100 ${
                     isBreakEven
                       ? "bg-[var(--color-principal-light)]"
-                      : isEven
-                      ? "bg-transparent"
-                      : "bg-[rgba(255,255,255,0.015)]"
-                  }`}
+                      : idx % 2 !== 0
+                      ? "bg-[rgba(255,255,255,0.012)]"
+                      : "bg-transparent"
+                  } hover:bg-[var(--color-bg-input-hover)]`}
                 >
-                  <td
-                    className={`py-[11px] pr-[14px] pl-5 font-semibold ${
+                  <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                    <span className={`text-[0.82rem] font-bold tabular-nums ${
                       isBreakEven ? "text-[var(--color-principal)]" : "text-[var(--color-text-primary)]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span>{row.month}</span>
-                      {isBreakEven && (
-                        <span className="be-badge">BE</span>
-                      )}
-                    </div>
+                    }`}>
+                      {row.month}
+                    </span>
                   </td>
-                  <td className="py-[11px] px-[14px] text-right text-[var(--color-text-secondary)] font-medium">
+
+                  {/* EMI */}
+                  <td className="hidden sm:table-cell py-2.5 px-3 text-right text-[var(--color-text-muted)] font-medium tabular-nums whitespace-nowrap">
                     {formatINR(row.emi)}
                   </td>
-                  <td className="py-[11px] px-[14px] text-right font-semibold text-[var(--color-principal)]">
+
+                  {/* Principal */}
+                  <td className="py-2.5 px-3 text-right font-semibold text-[var(--color-principal)] tabular-nums whitespace-nowrap">
                     {formatINR(row.principal)}
                   </td>
-                  <td className="py-[11px] px-[14px] text-right font-medium text-[var(--color-interest)]">
+
+                  {/* Interest */}
+                  <td className="py-2.5 px-3 text-right font-medium text-[var(--color-interest)] tabular-nums whitespace-nowrap">
                     {formatINR(row.interest)}
                   </td>
+
+                  {/* Prepayment */}
                   {showPrepayment && (
-                    <td
-                      className={`py-[11px] px-[14px] text-right font-semibold ${
-                        row.prepayment > 0 ? "text-[var(--color-interest)]" : "text-[var(--color-text-muted)]"
-                      }`}
-                    >
-                      {row.prepayment > 0 ? formatINR(row.prepayment) : "—"}
+                    <td className="hidden md:table-cell py-2.5 px-3 text-right font-semibold tabular-nums whitespace-nowrap">
+                      {row.prepayment > 0 ? (
+                        <span className="text-[var(--color-interest)]">{formatINR(row.prepayment)}</span>
+                      ) : (
+                        <span className="text-[var(--color-border-bright)]">—</span>
+                      )}
                     </td>
                   )}
-                  <td className="py-[11px] pl-[14px] pr-5 text-right text-[var(--color-text-secondary)] font-medium">
-                    {formatINR(row.balance)}
+
+                  {/* Balance */}
+                  <td className={`py-2.5 pl-3 pr-4 sm:pr-5 text-right font-medium tabular-nums whitespace-nowrap ${
+                    row.balance === 0
+                      ? "text-[var(--color-principal)]"
+                      : "text-[var(--color-text-secondary)]"
+                  }`}>
+                    {row.balance === 0 ? "Paid off" : formatINR(row.balance)}
                   </td>
-                </tr>
-              );
+                </tr>,
+              ];
             })}
           </tbody>
         </table>

@@ -30,9 +30,30 @@ export function reducer(state: SharedState = initialState, action: AppAction): S
   };
 
   switch (action.type) {
-    case "SET_LOAN":
-      nextBase.loan = { ...state.loan, ...action.payload };
+    case "SET_LOAN": {
+      const updatedLoan = { ...state.loan, ...action.payload };
+      nextBase.loan = updatedLoan;
+      const primaryIdx = state.scenarios.findIndex((s) => s.id === "scenario-primary");
+      if (primaryIdx >= 0) {
+        nextBase.scenarios = state.scenarios.map((s) =>
+          s.id === "scenario-primary"
+            ? { ...s, amount: updatedLoan.amount, rate: updatedLoan.rate, tenure: updatedLoan.tenure }
+            : s
+        );
+      } else if (state.scenarios.length < 3) {
+        nextBase.scenarios = [
+          ...state.scenarios,
+          {
+            id: "scenario-primary",
+            name: "My Loan",
+            amount: updatedLoan.amount,
+            rate: updatedLoan.rate,
+            tenure: updatedLoan.tenure,
+          },
+        ];
+      }
       break;
+    }
 
     case "SET_MODE":
       nextBase.mode = action.payload;
@@ -60,6 +81,12 @@ export function reducer(state: SharedState = initialState, action: AppAction): S
 
     case "ADD_PREPAYMENT":
       nextBase.prepayments = [...state.prepayments, action.payload];
+      break;
+
+    case "UPDATE_PREPAYMENT":
+      nextBase.prepayments = state.prepayments.map((p) =>
+        p.id === action.payload.id ? action.payload : p
+      );
       break;
 
     case "REMOVE_PREPAYMENT":

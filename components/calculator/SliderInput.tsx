@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 interface SliderInputProps {
   label: string;
@@ -18,6 +18,38 @@ interface SliderInputProps {
   accentColor?: string;
 }
 
+function formatBubbleValue(
+  value: number,
+  prefix?: string,
+  suffix?: string,
+  formatDisplay?: (v: number) => string
+): string {
+  if (formatDisplay) return formatDisplay(value);
+  if (prefix === "₹") {
+    if (value >= 10000000) return `₹${(value / 10000000).toFixed(1)}Cr`;
+    if (value >= 100000) return `₹${(value / 100000).toFixed(1)}L`;
+    if (value >= 1000) return `₹${(value / 1000).toFixed(0)}k`;
+    return `₹${value}`;
+  }
+  return `${value}${suffix ?? ""}`;
+}
+
+function ChevronUp() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="18 15 12 9 6 15" />
+    </svg>
+  );
+}
+
+function ChevronDown() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
 export default function SliderInput({
   label,
   value,
@@ -27,6 +59,7 @@ export default function SliderInput({
   onChange,
   prefix,
   suffix,
+  formatDisplay,
   minLabel,
   maxLabel,
   helperText,
@@ -34,6 +67,7 @@ export default function SliderInput({
 }: SliderInputProps) {
   const inputId = useId();
   const sliderId = useId();
+  const numberInputRef = useRef<HTMLInputElement>(null);
 
   const clamp = useCallback(
     (val: number) => Math.min(max, Math.max(min, val)),
@@ -42,6 +76,16 @@ export default function SliderInput({
 
   const [localValue, setLocalValue] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const [liveValue, setLiveValue] = useState(value);
+  const isDraggingRef = useRef(false);
+
+  useEffect(() => {
+    if (!isDraggingRef.current) {
+      setLiveValue(value);
+    }
+  }, [value]);
 
   const handleNumberChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,32 +99,88 @@ export default function SliderInput({
     [onChange, clamp]
   );
 
-  const handleNumberBlur = useCallback(
-    () => {
-      setIsFocused(false);
-      const parsed = parseFloat(localValue);
-      if (isNaN(parsed)) {
-        onChange(min);
-      } else {
-        onChange(clamp(parsed));
-      }
-    },
-    [localValue, onChange, clamp, min]
-  );
+  const handleNumberBlur = useCallback(() => {
+    setIsFocused(false);
+    const parsed = parseFloat(localValue);
+    if (isNaN(parsed) || localValue === "") {
+      onChange(min);
+    } else {
+      onChange(clamp(parsed));
+    }
+  }, [localValue, onChange, clamp, min]);
 
   const handleNumberFocus = useCallback(() => {
     setIsFocused(true);
-    setLocalValue(value.toString());
+    setLocalValue(String(value));
   }, [value]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        const newVal = clamp(liveValue + step);
+        setLiveValue(newVal);
+        onChange(newVal);
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        const newVal = clamp(liveValue - step);
+        setLiveValue(newVal);
+        onChange(newVal);
+      }
+    },
+    [liveValue, step, clamp, onChange]
+  );
+
+  const handleIncrement = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const newVal = clamp(liveValue + step);
+      setLiveValue(newVal);
+      onChange(newVal);
+    },
+    [liveValue, step, clamp, onChange]
+  );
+
+  const handleDecrement = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      const newVal = clamp(liveValue - step);
+      setLiveValue(newVal);
+      onChange(newVal);
+    },
+    [liveValue, step, clamp, onChange]
+  );
 
   const handleSliderChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(parseFloat(e.target.value));
+      const v = parseFloat(e.target.value);
+      setLiveValue(v);
+      onChange(v);
     },
     [onChange]
   );
 
-  const fillPercent = ((value - min) / (max - min)) * 100;
+  const startDrag = useCallback(() => {
+    isDraggingRef.current = true;
+    setIsDragging(true);
+  }, []);
+
+  const endDrag = useCallback(() => {
+    isDraggingRef.current = false;
+    setIsDragging(false);
+  }, []);
+
+  const fillPercent = ((liveValue - min) / (max - min)) * 100;
+  const bubbleLabel = formatBubbleValue(liveValue, prefix, suffix, formatDisplay);
+  const sliderBackground = `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${fillPercent}%, var(--color-border) ${fillPercent}%, var(--color-border) 100%)`;
+
+  const displayValue = isFocused
+    ? localValue
+    : formatDisplay
+    ? formatDisplay(liveValue)
+    : String(liveValue);
+
+  const showSuffix = suffix && (!formatDisplay || isFocused);
 
   return (
     <div className="flex flex-col gap-2.5">
@@ -99,53 +199,92 @@ export default function SliderInput({
           )}
         </div>
 
-        <div
-          className="flex items-center gap-1.5 bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-[12px] px-3.5 py-2 transition-all duration-200 focus-within:border-[var(--color-principal)] focus-within:shadow-[0_0_0_4px_var(--color-principal-light)]"
-        >
+        <div className="group flex items-center gap-1 bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-[12px] px-3 py-2 transition-all duration-200 focus-within:border-[var(--color-principal)] focus-within:shadow-[0_0_0_4px_var(--color-principal-light)]">
           {prefix && (
-            <span className="text-[0.8rem] text-[var(--color-text-muted)] select-none">
+            <span className="text-[0.8rem] text-[var(--color-text-muted)] select-none mr-0.5">
               {prefix}
             </span>
           )}
           <input
             id={inputId}
-            type="number"
-            value={isFocused ? localValue : value}
-            min={min}
-            max={max}
-            step={step}
+            ref={numberInputRef}
+            type="text"
+            inputMode="decimal"
+            value={displayValue}
             onChange={handleNumberChange}
             onFocus={handleNumberFocus}
             onBlur={handleNumberBlur}
+            onKeyDown={handleKeyDown}
             placeholder={String(value)}
-            className="w-20 bg-transparent border-none outline-none text-[1rem] font-extrabold text-[var(--color-principal)] text-right font-[inherit] appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-[72px] bg-transparent border-none outline-none text-[1rem] font-extrabold text-[var(--color-principal)] text-right font-[inherit]"
             aria-label={label}
           />
-          {suffix && (
-            <span className="text-[0.8rem] text-[var(--color-text-muted)] select-none">
+          {showSuffix && (
+            <span className="text-[0.8rem] text-[var(--color-text-muted)] select-none ml-0.5">
               {suffix}
             </span>
           )}
+
+          <div className="flex flex-col shrink-0 ml-1 gap-px opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <button
+              type="button"
+              tabIndex={-1}
+              onMouseDown={handleIncrement}
+              className="w-[18px] h-[14px] flex items-center justify-center rounded-[4px] text-[var(--color-text-muted)] hover:text-[var(--color-principal)] hover:bg-[var(--color-principal-light)] transition-colors duration-100"
+              aria-label={`Increase ${label}`}
+            >
+              <ChevronUp />
+            </button>
+            <button
+              type="button"
+              tabIndex={-1}
+              onMouseDown={handleDecrement}
+              className="w-[18px] h-[14px] flex items-center justify-center rounded-[4px] text-[var(--color-text-muted)] hover:text-[var(--color-principal)] hover:bg-[var(--color-principal-light)] transition-colors duration-100"
+              aria-label={`Decrease ${label}`}
+            >
+              <ChevronDown />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="relative py-1 mt-2">
-        <div
-          className="absolute top-1/2 left-0 h-[6px] rounded-full -translate-y-1/2 pointer-events-none transition-[width] duration-[50ms] ease-out"
-          style={{
-            width: `${fillPercent}%`,
-            background: accentColor,
-          }}
-        />
+      <div className="relative py-1 mt-1">
+        {isDragging && (
+          <div
+            className="absolute bottom-[calc(100%+8px)] pointer-events-none z-10"
+            style={{
+              left: `calc(${fillPercent}% + ${12 - fillPercent * 0.24}px)`,
+              transform: "translateX(-50%)",
+            }}
+          >
+            <div
+              className="px-2.5 py-1 rounded-lg text-[0.72rem] font-bold text-white whitespace-nowrap shadow-lg"
+              style={{ background: accentColor }}
+            >
+              {bubbleLabel}
+            </div>
+            <div
+              className="w-0 h-0 mx-auto border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent"
+              style={{ borderTopColor: accentColor }}
+            />
+          </div>
+        )}
+
         <input
           id={sliderId}
           type="range"
           min={min}
           max={max}
           step={step}
-          value={value}
+          value={liveValue}
           onChange={handleSliderChange}
-          className="relative w-full"
+          onMouseDown={startDrag}
+          onMouseUp={endDrag}
+          onMouseLeave={endDrag}
+          onTouchStart={startDrag}
+          onTouchEnd={endDrag}
+          className={`relative w-full${isDragging ? " is-dragging" : ""}`}
+          style={{ background: sliderBackground }}
           aria-label={label}
         />
       </div>

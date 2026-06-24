@@ -23,7 +23,7 @@ export default function SensitivityTable() {
   );
 
   return (
-    <div className="glass-card p-7 flex flex-col gap-[18px]">
+    <div className="glass-card p-4 sm:p-7 flex flex-col gap-4">
       <div>
         <div className="flex items-center gap-2.5 mb-1">
           <div className="w-[30px] h-[30px] rounded-lg bg-[var(--color-principal-light)] flex items-center justify-center">
@@ -74,6 +74,8 @@ export default function SensitivityTable() {
                 {rates.map((r, ri) => {
                   const cellEMI = grid[ti]?.[ri] ?? 0;
                   const isCenter = r === rate && t === tenure;
+                  const isCurrentRow = t === tenure;
+                  const isCurrentCol = r === rate;
 
                   return (
                     <td
@@ -81,12 +83,12 @@ export default function SensitivityTable() {
                       className={`py-[7px] px-2.5 text-right whitespace-nowrap rounded-[7px] text-[0.78rem] transition-colors duration-150 cursor-default ${
                         isCenter
                           ? "font-extrabold bg-[var(--color-principal)] text-white shadow-[0_4px_16px_var(--color-principal-glow)]"
-                          : r === rate || t === tenure
-                          ? "font-medium bg-[var(--color-bg-input)] text-[var(--color-text-primary)] shadow-none"
-                          : "font-medium bg-transparent text-[var(--color-text-secondary)] shadow-none"
+                          : isCurrentRow || isCurrentCol
+                          ? "font-medium bg-[var(--color-bg-input)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-input-hover)]"
+                          : "font-medium bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-input)] hover:text-[var(--color-text-primary)]"
                       }`}
                     >
-                      {formatINR(cellEMI)}
+                      <span className="tabular-nums">{formatINR(cellEMI)}</span>
                     </td>
                   );
                 })}

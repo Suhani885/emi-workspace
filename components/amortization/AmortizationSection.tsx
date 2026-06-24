@@ -67,8 +67,8 @@ export default function AmortizationSection({
   };
 
   return (
-    <div className="glass-card p-7 flex flex-col gap-5">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="glass-card p-4 sm:p-7 flex flex-col gap-4 sm:gap-5">
+      <div className="flex items-start justify-between gap-3 sm:gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-[30px] h-[30px] rounded-lg bg-[var(--color-interest-light)] flex items-center justify-center">
@@ -84,7 +84,7 @@ export default function AmortizationSection({
             {subtitle}
           </p>
           {breakEvenMonth > 0 && (
-            <div className="inline-flex items-center gap-1.5 mt-2 ml-10 px-2.5 py-1 bg-[var(--color-interest-light)] rounded-full border border-[var(--color-interest-light)]">
+            <div className="inline-flex items-center gap-1.5 mt-2 ml-0 sm:ml-10 px-2.5 py-1 bg-[var(--color-interest-light)] rounded-full border border-[var(--color-interest-light)]">
               <span className="text-[0.7rem] text-[var(--color-interest)] font-bold">
                 Break-even at month {breakEvenMonth}
               </span>
@@ -95,7 +95,7 @@ export default function AmortizationSection({
         <div className="w-full md:w-auto flex justify-center md:justify-end items-center gap-3">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-1.5 py-1.5 px-3 rounded-[7px] text-[0.78rem] font-semibold bg-[var(--color-bg-input)] text-[var(--color-text-secondary)] border border-[var(--color-border)] cursor-pointer transition-all duration-200 hover:text-[var(--color-principal)] hover:border-[var(--color-principal)]"
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-[7px] text-[0.66rem] font-semibold bg-[var(--color-bg-input)] text-[var(--color-text-secondary)] border border-[var(--color-border)] cursor-pointer transition-all duration-200 hover:text-[var(--color-principal)] hover:border-[var(--color-principal)]"
             title="Export schedule as CSV"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -147,7 +147,7 @@ export default function AmortizationSection({
           </div>
           {breakEvenMonth > 0 && (
             <div className="flex items-center gap-2">
-              <div className="w-3 h-[2px] border-t-2 border-dashed border-[var(--color-interest)]" />
+              <div className="w-5 h-[2px] border-t-2 border-dashed border-[var(--color-interest)]" />
               <span className="text-[0.75rem] text-[var(--color-text-secondary)] font-medium">Break-even</span>
             </div>
           )}

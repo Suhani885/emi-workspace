@@ -8,6 +8,7 @@ export const ActionTypes = {
   UPDATE_SCENARIO: "UPDATE_SCENARIO",
   REMOVE_SCENARIO: "REMOVE_SCENARIO",
   ADD_PREPAYMENT: "ADD_PREPAYMENT",
+  UPDATE_PREPAYMENT: "UPDATE_PREPAYMENT",
   REMOVE_PREPAYMENT: "REMOVE_PREPAYMENT",
   SET_THEME: "SET_THEME",
   SYNC_STATE: "SYNC_STATE",
@@ -24,6 +25,7 @@ export type AppAction =
   | { type: "UPDATE_SCENARIO"; payload: { id: string; updates: Partial<Scenario> } }
   | { type: "REMOVE_SCENARIO"; payload: string }
   | { type: "ADD_PREPAYMENT"; payload: Prepayment }
+  | { type: "UPDATE_PREPAYMENT"; payload: Prepayment }
   | { type: "REMOVE_PREPAYMENT"; payload: string }
   | { type: "SET_THEME"; payload: Theme }
   | { type: "SYNC_STATE"; payload: SharedState }

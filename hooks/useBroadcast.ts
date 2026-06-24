@@ -8,17 +8,21 @@ import type { BroadcastMessage } from "@/types/presence";
 export function useBroadcast(
   state: SharedState,
   dispatch: React.Dispatch<AppAction>,
-  tabId: string
+  tabId: string,
+  joinedAt: number
 ) {
   const channelRef = useRef<BroadcastChannel | null>(null);
   const isSyncingRef = useRef(false);
   const prevStateRef = useRef<SharedState>(state);
 
   useEffect(() => {
+    if (!tabId) return;
+
     channelRef.current = new BroadcastChannel("emi-workspace");
     channelRef.current.postMessage({
       type: "LEADER_REQUEST",
       tabId,
+      joinedAt,
     });
 
     channelRef.current.onmessage = (event: MessageEvent<BroadcastMessage>) => {
@@ -39,7 +43,7 @@ export function useBroadcast(
       channelRef.current?.close();
       channelRef.current = null;
     };
-  }, [tabId, dispatch]);
+  }, [tabId, joinedAt, dispatch]);
 
   useEffect(() => {
     if (isSyncingRef.current) return;

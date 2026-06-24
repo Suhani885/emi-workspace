@@ -13,7 +13,7 @@ interface PrepaymentFormState {
   amount: string;
 }
 
-const EMPTY_FORM: PrepaymentFormState = { month: "1", amount: "50000" };
+const EMPTY_FORM: PrepaymentFormState = { month: "", amount: "" };
 
 function formatTenure(months: number): string {
   const y = Math.floor(months / 12);
@@ -65,13 +65,39 @@ function PrepaymentImpactPanel({
   originalTotalInterest: number;
 }) {
   const hasPrepayments = interestSaved > 0 || tenureReduced > 0;
+  const savingsPercent = originalTotalInterest > 0
+    ? Math.round((interestSaved / originalTotalInterest) * 100)
+    : 0;
+  const savingsBarWidth = Math.min(100, savingsPercent);
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-input)] p-5 flex flex-col gap-4 h-full">
-      <div className="flex items-center gap-2">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-input)] p-5 flex flex-col gap-4 h-full min-h-[280px]">
+      <div className="flex items-center justify-between gap-2 min-h-[22px]">
         <p className="text-[0.7rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.07em]">
           Prepayment Impact
         </p>
+        <span
+          className="text-[0.7rem] font-extrabold text-[var(--color-interest)] bg-[var(--color-interest-light)] px-2 py-0.5 rounded-full transition-opacity duration-300"
+          style={{ opacity: hasPrepayments ? 1 : 0 }}
+        >
+          −{savingsPercent}% interest
+        </span>
+      </div>
+
+      <div
+        className="flex flex-col gap-1.5 transition-opacity duration-300"
+        style={{ opacity: hasPrepayments ? 1 : 0 }}
+      >
+        <div className="flex justify-between text-[0.65rem] text-[var(--color-text-muted)] font-medium">
+          <span>Interest savings</span>
+          <span className="text-[var(--color-interest)] font-bold">{formatINR(interestSaved)}</span>
+        </div>
+        <div className="h-2 rounded-full bg-[var(--color-border)] overflow-hidden">
+          <div
+            className="h-full rounded-full bg-[var(--color-interest)] transition-[width] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            style={{ width: `${savingsBarWidth}%` }}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -89,9 +115,7 @@ function PrepaymentImpactPanel({
         />
       </div>
 
-      <div
-        className={`h-px ${hasPrepayments ? "bg-[rgba(0,212,170,0.2)]" : "bg-[var(--color-border)]"}`}
-      />
+      <div className="h-px bg-[var(--color-border)]" />
 
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -127,6 +151,7 @@ export default function PrepaymentPlanner() {
 
   const [form, setForm] = useState<PrepaymentFormState>(EMPTY_FORM);
   const [errors, setErrors] = useState<Partial<PrepaymentFormState>>({});
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const { emi } = useEMI(loan.amount, loan.rate, loan.tenure);
 
@@ -158,38 +183,80 @@ export default function PrepaymentPlanner() {
     return Object.keys(errs).length === 0;
   }, [form, loan.tenure]);
 
-  const handleAdd = useCallback(() => {
+  const handleSubmit = useCallback(() => {
     if (!validate()) return;
 
-    const prepayment: Prepayment = {
-      id: `pp-${Date.now()}`,
-      month: parseInt(form.month, 10),
-      amount: parseFloat(form.amount),
-    };
-
-    dispatch({ type: "ADD_PREPAYMENT", payload: prepayment });
+    if (editingId) {
+      const updated: Prepayment = {
+        id: editingId,
+        month: parseInt(form.month, 10),
+        amount: parseFloat(form.amount),
+      };
+      dispatch({ type: "UPDATE_PREPAYMENT", payload: updated });
+      setEditingId(null);
+    } else {
+      const prepayment: Prepayment = {
+        id: `pp-${Date.now()}`,
+        month: parseInt(form.month, 10),
+        amount: parseFloat(form.amount),
+      };
+      dispatch({ type: "ADD_PREPAYMENT", payload: prepayment });
+    }
     setForm(EMPTY_FORM);
     setErrors({});
-  }, [validate, form, dispatch]);
+  }, [validate, form, dispatch, editingId]);
+
+  const handleEdit = useCallback((pp: Prepayment) => {
+    setEditingId(pp.id);
+    setForm({ month: String(pp.month), amount: String(pp.amount) });
+    setErrors({});
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingId(null);
+    setForm(EMPTY_FORM);
+    setErrors({});
+  }, []);
 
   const handleRemove = useCallback(
     (id: string) => {
       dispatch({ type: "REMOVE_PREPAYMENT", payload: id });
+      if (editingId === id) {
+        setEditingId(null);
+        setForm(EMPTY_FORM);
+        setErrors({});
+      }
     },
-    [dispatch]
+    [dispatch, editingId]
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter") handleAdd();
+      if (e.key === "Enter") handleSubmit();
     },
-    [handleAdd]
+    [handleSubmit]
   );
 
   const sortedPrepayments = useMemo(
     () => [...prepayments].sort((a, b) => a.month - b.month),
     [prepayments]
   );
+
+  const groupedPrepayments = useMemo(() => {
+    const map = new Map<number, Prepayment[]>();
+    for (const pp of sortedPrepayments) {
+      const arr = map.get(pp.month) ?? [];
+      arr.push(pp);
+      map.set(pp.month, arr);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([month, items]) => ({
+        month,
+        total: items.reduce((s, p) => s + p.amount, 0),
+        items,
+      }));
+  }, [sortedPrepayments]);
 
   const getInputClass = (hasError: boolean) =>
     `w-full bg-[var(--color-bg-input)] border rounded-[10px] py-2.5 px-3.5 text-[var(--color-text-primary)] text-[0.875rem] font-[inherit] outline-none transition-all duration-200 focus:border-[var(--color-principal)] focus:shadow-[0_0_0_3px_var(--color-principal-light)] ${
@@ -198,7 +265,7 @@ export default function PrepaymentPlanner() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="glass-card p-7 flex flex-col gap-[22px]">
+      <div className="glass-card p-4 sm:p-7 flex flex-col gap-4 sm:gap-5">
         <div>
           <div className="flex items-center gap-2.5 mb-1">
             <div className="w-[30px] h-[30px] rounded-lg bg-[var(--color-interest-light)] flex items-center justify-center shrink-0">
@@ -218,9 +285,19 @@ export default function PrepaymentPlanner() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="flex flex-col gap-4">
-            <p className="text-[0.8rem] font-bold text-[var(--color-text-secondary)]">
-              Schedule a prepayment
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-[0.8rem] font-bold text-[var(--color-text-secondary)]">
+                {editingId ? "Edit prepayment" : "Schedule a prepayment"}
+              </p>
+              {editingId && (
+                <button
+                  onClick={handleCancelEdit}
+                  className="text-[0.72rem] font-semibold text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors duration-150"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
@@ -272,50 +349,127 @@ export default function PrepaymentPlanner() {
             </div>
 
             <button
-              onClick={handleAdd}
-              className="btn-primary w-full"
+              onClick={handleSubmit}
+              className={`btn-primary w-full ${editingId ? "bg-[var(--color-interest)] shadow-[0_4px_16px_var(--color-interest-light)]" : ""}`}
             >
-              + Add Prepayment
+              {editingId ? "✓ Update Prepayment" : "+ Add Prepayment"}
             </button>
 
-            {sortedPrepayments.length > 0 ? (
+            {groupedPrepayments.length > 0 ? (
               <div className="flex flex-col gap-2">
                 <p className="text-[0.72rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.05em]">
-                  Scheduled ({sortedPrepayments.length})
+                  Scheduled ({groupedPrepayments.length} month{groupedPrepayments.length !== 1 ? "s" : ""}, {sortedPrepayments.length} payment{sortedPrepayments.length !== 1 ? "s" : ""})
                 </p>
-                <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto pr-1">
-                  {sortedPrepayments.map((pp) => (
-                    <div
-                      key={pp.id}
-                      className="flex items-center justify-between py-2.5 px-3.5 rounded-[10px] bg-[var(--color-bg-input)] border border-[var(--color-border)] transition-colors duration-150 hover:border-[var(--color-interest)]"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="py-[3px] px-2 rounded-md bg-[var(--color-interest-light)] border border-[var(--color-interest-light)]">
-                          <span className="text-[0.68rem] font-bold text-[var(--color-interest)]">
-                            Mo {pp.month}
-                          </span>
-                        </div>
-                        <span className="text-[0.85rem] font-bold text-[var(--color-text-primary)]">
-                          {formatINR(pp.amount)}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => handleRemove(pp.id)}
-                        className="w-6 h-6 rounded-md border-none bg-transparent text-[var(--color-text-muted)] cursor-pointer flex items-center justify-center transition-all duration-150 hover:text-[var(--color-danger)] hover:bg-[rgba(255,92,124,0.1)]"
-                        aria-label="Remove prepayment"
+                <div className="flex flex-col gap-1.5 max-h-[220px] overflow-y-auto pr-1">
+                  {groupedPrepayments.map(({ month, total, items }) => {
+                    const isGroupEditing = items.some((pp) => editingId === pp.id);
+                    return (
+                      <div
+                        key={month}
+                        className={`rounded-[10px] bg-[var(--color-bg-input)] border transition-colors duration-150 ${
+                          isGroupEditing
+                            ? "border-[var(--color-interest)] shadow-[0_0_0_2px_var(--color-interest-light)]"
+                            : "border-[var(--color-border)]"
+                        }`}
                       >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18"/>
-                          <line x1="6" y1="6" x2="18" y2="18"/>
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
+                        {/* Summary row */}
+                        <div className="flex items-center justify-between py-2.5 px-3.5">
+                          <div className="flex items-center gap-3">
+                            <div className="py-[3px] px-2 rounded-md bg-[var(--color-interest-light)] border border-[var(--color-interest-light)]">
+                              <span className="text-[0.68rem] font-bold text-[var(--color-interest)]">
+                                Mo {month}
+                              </span>
+                            </div>
+                            <div className="flex flex-col gap-[1px]">
+                              <span className="text-[0.85rem] font-bold text-[var(--color-text-primary)]">
+                                {formatINR(total)}
+                              </span>
+                              {items.length > 1 && (
+                                <span className="text-[0.62rem] text-[var(--color-text-muted)] font-medium">
+                                  {items.length} payments
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {items.length === 1 && (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleEdit(items[0])}
+                                className="w-6 h-6 rounded-md border-none bg-transparent text-[var(--color-text-muted)] cursor-pointer flex items-center justify-center transition-all duration-150 hover:text-[var(--color-interest)] hover:bg-[var(--color-interest-light)]"
+                                aria-label="Edit prepayment"
+                              >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                              </button>
+                              <button
+                                onClick={() => handleRemove(items[0].id)}
+                                className="w-6 h-6 rounded-md border-none bg-transparent text-[var(--color-text-muted)] cursor-pointer flex items-center justify-center transition-all duration-150 hover:text-[var(--color-danger)] hover:bg-[rgba(255,92,124,0.1)]"
+                                aria-label="Remove prepayment"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                  <line x1="18" y1="6" x2="6" y2="18"/>
+                                  <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        {/* Individual rows for multi-payment months */}
+                        {items.length > 1 && (
+                          <div className="flex flex-col border-t border-[var(--color-border)]">
+                            {items.map((pp) => (
+                              <div
+                                key={pp.id}
+                                className={`flex items-center justify-between py-1.5 px-3.5 pl-[3.25rem] border-b border-[var(--color-border)] last:border-b-0 transition-colors duration-150 ${
+                                  editingId === pp.id ? "bg-[var(--color-interest-light)]" : "hover:bg-[var(--color-bg-input-hover)]"
+                                }`}
+                              >
+                                <span className="text-[0.78rem] text-[var(--color-text-secondary)] font-semibold tabular-nums">
+                                  {formatINR(pp.amount)}
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={() => handleEdit(pp)}
+                                    className="w-6 h-6 rounded-md border-none bg-transparent text-[var(--color-text-muted)] cursor-pointer flex items-center justify-center transition-all duration-150 hover:text-[var(--color-interest)] hover:bg-[var(--color-interest-light)]"
+                                    aria-label="Edit prepayment"
+                                  >
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
+                                  </button>
+                                  <button
+                                    onClick={() => handleRemove(pp.id)}
+                                    className="w-6 h-6 rounded-md border-none bg-transparent text-[var(--color-text-muted)] cursor-pointer flex items-center justify-center transition-all duration-150 hover:text-[var(--color-danger)] hover:bg-[rgba(255,92,124,0.1)]"
+                                    aria-label="Remove prepayment"
+                                  >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                      <line x1="18" y1="6" x2="6" y2="18"/>
+                                      <line x1="6" y1="6" x2="18" y2="18"/>
+                                    </svg>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ) : (
-              <div className="p-5 text-center border-2 border-dashed border-[var(--color-border)] rounded-xl text-[var(--color-text-muted)] text-[0.78rem]">
-                No prepayments yet. Add one above to see the impact.
+              <div className="p-5 text-center border-2 border-dashed border-[var(--color-border)] rounded-xl flex flex-col items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-[var(--color-bg-input-hover)] flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  </svg>
+                </div>
+                <p className="text-[0.75rem] font-semibold text-[var(--color-text-muted)]">No prepayments scheduled</p>
+                <p className="text-[0.7rem] text-[var(--color-text-muted)] opacity-70">Add one above to see interest savings</p>
               </div>
             )}
           </div>

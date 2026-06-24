@@ -1,5 +1,10 @@
+export interface PresenceEntry {
+  lastSeen: number;
+  joinedAt: number;
+}
+
 export interface PresenceMap {
-  [tabId: string]: number;
+  [tabId: string]: PresenceEntry;
 }
 
 export interface TabMeta {
@@ -19,4 +24,5 @@ export interface BroadcastMessage {
   type: BroadcastMessageType;
   tabId: string;
   payload?: unknown;
+  joinedAt?: number;
 }
