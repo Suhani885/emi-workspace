@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { AmortizationRow } from "@/types/state";
 import AmortizationTable from "./AmortizationTable";
 import AmortizationChart from "./AmortizationChart";
+import Tooltip from "@/components/ui/Tooltip";
 
 interface AmortizationSectionProps {
   schedule: AmortizationRow[];
@@ -70,21 +71,23 @@ export default function AmortizationSection({
     <div className="glass-card p-4 sm:p-7 flex flex-col gap-4 sm:gap-5">
       <div className="flex items-start justify-between gap-3 sm:gap-4 flex-wrap">
         <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-[30px] h-[30px] rounded-lg bg-[var(--color-interest-light)] flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-interest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-            </div>
-            <h2 className="text-base font-bold text-[var(--color-text-primary)]">
-              {title}
-            </h2>
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <div className="w-1 h-4 rounded-full bg-[var(--color-interest)] shrink-0"></div>
+            <Tooltip content={subtitle} className="w-max">
+              <h2 className="text-[0.8rem] font-extrabold uppercase tracking-[0.08em] text-[var(--color-text-primary)] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]">
+                {title}
+              </h2>
+            </Tooltip>
+            {breakEvenMonth > 0 && (
+              <div className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 bg-[var(--color-interest-light)] rounded-full border border-[var(--color-interest-light)]">
+                <span className="text-[0.7rem] text-[var(--color-interest)] font-bold">
+                  Break-even at month {breakEvenMonth}
+                </span>
+              </div>
+            )}
           </div>
-          <p className="text-[0.72rem] text-[var(--color-text-muted)] ml-10">
-            {subtitle}
-          </p>
           {breakEvenMonth > 0 && (
-            <div className="inline-flex items-center gap-1.5 mt-2 ml-0 sm:ml-10 px-2.5 py-1 bg-[var(--color-interest-light)] rounded-full border border-[var(--color-interest-light)]">
+            <div className="lg:hidden inline-flex items-center gap-1.5 ml-3 px-2.5 py-1 bg-[var(--color-interest-light)] rounded-full border border-[var(--color-interest-light)]">
               <span className="text-[0.7rem] text-[var(--color-interest)] font-bold">
                 Break-even at month {breakEvenMonth}
               </span>

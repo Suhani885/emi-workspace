@@ -7,6 +7,7 @@ import { useAmortization } from "@/hooks/useAmortization";
 import { formatINR } from "@/utils/format";
 import AmortizationSection from "@/components/amortization/AmortizationSection";
 import type { Prepayment } from "@/types/state";
+import Tooltip from "@/components/ui/Tooltip";
 
 interface PrepaymentFormState {
   month: string;
@@ -267,20 +268,17 @@ export default function PrepaymentPlanner() {
     <div className="flex flex-col gap-6">
       <div className="glass-card p-4 sm:p-7 flex flex-col gap-4 sm:gap-5">
         <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-[30px] h-[30px] rounded-lg bg-[var(--color-interest-light)] flex items-center justify-center shrink-0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-interest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="1" x2="12" y2="23"/>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
-            </div>
-            <h2 className="text-base font-bold text-[var(--color-text-primary)]">
-              Prepayment Planner
-            </h2>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1 h-4 rounded-full bg-[var(--color-interest)]"></div>
+            <Tooltip
+              content="Schedule lump-sum payments and visualize interest savings"
+              className="w-max"
+            >
+              <h2 className="text-[0.8rem] font-extrabold uppercase tracking-[0.08em] text-[var(--color-text-primary)] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]">
+                Prepayment Planner
+              </h2>
+            </Tooltip>
           </div>
-          <p className="text-[0.72rem] text-[var(--color-text-muted)] ml-10">
-            Schedule lump-sum payments and visualize interest savings
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -372,7 +370,6 @@ export default function PrepaymentPlanner() {
                             : "border-[var(--color-border)]"
                         }`}
                       >
-                        {/* Summary row */}
                         <div className="flex items-center justify-between py-2.5 px-3.5">
                           <div className="flex items-center gap-3">
                             <div className="py-[3px] px-2 rounded-md bg-[var(--color-interest-light)] border border-[var(--color-interest-light)]">
@@ -416,7 +413,6 @@ export default function PrepaymentPlanner() {
                             </div>
                           )}
                         </div>
-                        {/* Individual rows for multi-payment months */}
                         {items.length > 1 && (
                           <div className="flex flex-col border-t border-[var(--color-border)]">
                             {items.map((pp) => (

@@ -24,7 +24,7 @@ export const initialState: SharedState = {
     },
   ],
   prepayments: [],
-  theme: "dark",
+  theme: "light",
   past: [],
   lastActionTime: 0,
 };

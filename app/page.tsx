@@ -10,6 +10,7 @@ import AmortizationSection from "@/components/amortization/AmortizationSection";
 import CompareScenarios from "@/components/compare/CompareScenarios";
 import TabIndicator from "@/components/TabIndicator";
 import PrepaymentPlanner from "@/components/prepayment/PrepaymentPlanner";
+import ShareButton from "@/components/layout/ShareButton";
 
 type Tab = "single" | "compare" | "prepayment";
 
@@ -143,23 +144,21 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-[var(--color-bg-base)]">
-      <header className="px-4 md:px-6 sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-bg-base)] backdrop-blur-[20px] h-[60px] flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div>
-            <p className="text-[0.8rem] sm:text-[1.2rem] font-bold text-[var(--color-text-primary)] leading-[1.2] whitespace-nowrap">
-              EMI Workspace
-            </p>
-          </div>
+      <header className="px-3 sm:px-4 md:px-6 sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-bg-base)] backdrop-blur-[20px] h-[54px] sm:h-[60px] flex items-center justify-between gap-2">
+        <div className="flex items-center min-w-0">
+          <p className="text-[0.9rem] sm:text-[1.1rem] font-bold text-[var(--color-text-primary)] leading-[1.2] whitespace-nowrap">
+            EMI Workspace
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-1 sm:gap-2">
           <TabIndicator />
 
           <div className="relative group flex items-center justify-center">
             <button
               onClick={() => dispatch({ type: "UNDO" })}
               disabled={!state.past || state.past.length === 0}
-              className={`w-10 h-10 sm:w-9 sm:h-9 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-bg-card)] flex items-center justify-center transition-all duration-150 shrink-0 ${
+              className={`w-8 h-8 sm:w-9 sm:h-9 rounded-[9px] border border-[var(--color-border)] bg-[var(--color-bg-card)] flex items-center justify-center transition-all duration-150 shrink-0 ${
                 !state.past || state.past.length === 0
                   ? "opacity-40 cursor-not-allowed text-[var(--color-text-muted)]"
                   : "text-[var(--color-text-secondary)] hover:border-[var(--color-principal)] hover:text-[var(--color-principal)] active:scale-[0.92]"
@@ -173,6 +172,10 @@ export default function Page() {
             </div>
           </div>
 
+          <div className="hidden sm:flex">
+            <ShareButton />
+          </div>
+
           <div className="relative group flex items-center justify-center">
             <button
               onClick={() =>
@@ -181,7 +184,7 @@ export default function Page() {
                   payload: theme === "light" ? "dark" : "light",
                 })
               }
-              className="w-10 h-10 sm:w-9 sm:h-9 rounded-[10px] border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-secondary)] flex items-center justify-center transition-all duration-150 hover:border-[var(--color-principal)] hover:text-[var(--color-principal)] active:scale-[0.92] shrink-0"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-[9px] border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-secondary)] flex items-center justify-center transition-all duration-150 hover:border-[var(--color-principal)] hover:text-[var(--color-principal)] active:scale-[0.92] shrink-0"
               aria-label="Toggle theme"
             >
               {theme === "light" ? <MoonIcon /> : <SunIcon />}
@@ -193,13 +196,13 @@ export default function Page() {
         </div>
       </header>
 
-      <div className="max-w-[1200px] mx-auto py-4 sm:py-6 px-3 sm:px-4 md:px-6">
-        <div className="flex gap-1 p-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[14px] shadow-sm w-max max-w-full mb-4 sm:mb-6 overflow-x-auto scrollbar-hide">
+      <div className="max-w-[1200px] mx-auto py-3 sm:py-6 px-2.5 sm:px-4 md:px-6">
+        <div className="flex gap-0.5 sm:gap-1 p-0.5 sm:p-1 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[12px] sm:rounded-[14px] shadow-sm w-max max-w-full mb-3 sm:mb-6 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => dispatch({ type: "SET_MODE", payload: tab.id })}
-              className={`flex items-center gap-[6px] py-2 px-2.5 sm:px-3.5 rounded-[10px] text-[0.8rem] font-bold border-none cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] whitespace-nowrap shrink-0 ${
+              className={`flex items-center gap-[5px] py-1.5 sm:py-2 px-2 sm:px-3.5 rounded-[9px] sm:rounded-[10px] text-[0.72rem] sm:text-[0.8rem] font-bold border-none cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] whitespace-nowrap shrink-0 ${
                 mode === tab.id
                   ? "bg-[var(--color-principal)] text-white shadow-sm"
                   : "bg-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-input)]"
@@ -213,7 +216,7 @@ export default function Page() {
 
         {mode === "single" && (
           <div className="animate-fade-slide-up">
-            <div className="grid grid-cols-1 md:grid-cols-[340px_1fr] lg:grid-cols-[400px_1fr] gap-4 sm:gap-6 mb-4 sm:mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] lg:grid-cols-[400px_1fr] gap-3 sm:gap-6 mb-3 sm:mb-6">
               <LoanInputs />
               <div className="flex flex-col gap-6">
                 <SummaryCards />

@@ -7,6 +7,7 @@ import { initialState } from "./initialState";
 import { useTabId } from "@/hooks/useTabId";
 import { useBroadcast } from "@/hooks/useBroadcast";
 import { usePresence } from "@/hooks/usePresence";
+import { useUrlState } from "@/hooks/useUrlState";
 import ThemeApplier from "@/components/layout/ThemeApplier";
 
 interface AppProviderProps {
@@ -23,6 +24,8 @@ export function AppProvider({ children, initialTheme }: AppProviderProps) {
   const { tabId, joinedAt } = useTabId();
   const channelRef = useBroadcast(state, dispatch, tabId, joinedAt);
   const { activeTabs, isLeader } = usePresence(tabId, joinedAt, channelRef);
+
+  useUrlState(state, dispatch);
 
   const stateRef = useRef(state);
   stateRef.current = state;

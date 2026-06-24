@@ -6,6 +6,7 @@ import { calculateEMI, calculateTotals } from "@/utils/emi";
 import { formatINR } from "@/utils/format";
 import SliderInput from "@/components/calculator/SliderInput";
 import type { Scenario } from "@/types/state";
+import Tooltip from "@/components/ui/Tooltip";
 
 const AMOUNT_MIN = 10000;
 const AMOUNT_MAX = 5000000;
@@ -189,19 +190,17 @@ export default function CompareScenarios() {
     <div className="glass-card p-4 sm:p-7 flex flex-col gap-4 sm:gap-5.5">
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <div className="flex items-center gap-2.5 mb-1">
-            <div className="w-[30px] h-[30px] rounded-lg bg-[var(--color-interest-light)] flex items-center justify-center">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-interest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-            </div>
-            <h2 className="text-base font-bold text-[var(--color-text-primary)]">
-              Compare Scenarios
-            </h2>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1 h-4 rounded-full bg-[var(--color-interest)]"></div>
+            <Tooltip
+              content="Configure up to 3 scenarios — lowest total cost highlighted"
+              className="w-max"
+            >
+              <h2 className="text-[0.8rem] font-extrabold uppercase tracking-[0.08em] text-[var(--color-text-primary)] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]">
+                Compare Scenarios
+              </h2>
+            </Tooltip>
           </div>
-          <p className="text-[0.72rem] text-[var(--color-text-muted)] ml-10">
-            Configure up to 3 scenarios — lowest total cost highlighted
-          </p>
         </div>
 
         {scenarios.length < 3 && (

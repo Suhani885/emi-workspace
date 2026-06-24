@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useAppContext } from "@/context/useAppContext";
 import SliderInput from "./SliderInput";
+import Tooltip from "@/components/ui/Tooltip";
 
 const AMOUNT_MIN = 10000;
 const AMOUNT_MAX = 5000000;
@@ -36,23 +37,24 @@ export default function LoanInputs() {
   );
 
   return (
-    <div className="glass-card p-4 sm:p-6 flex flex-col gap-5 sm:gap-6 relative overflow-hidden">
+    <div className="glass-card p-3 sm:p-6 flex flex-col gap-4 sm:gap-6 relative overflow-hidden">
       <div>
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-[36px] h-[36px] rounded-xl bg-[var(--color-principal-light)] flex items-center justify-center">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-principal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <h2 className="text-lg font-bold text-[var(--color-text-primary)] tracking-tight">
-            Loan Details
-          </h2>
+        <div className="flex items-center gap-2.5 mb-2">
+          <div className="w-1 h-5 rounded-full bg-[var(--color-principal)]"></div>
+          <Tooltip
+            content={
+              <><span className="font-bold opacity-90">Reducing-balance method</span> — interest charged only on outstanding principal each month.</>
+            }
+            className="w-max"
+          >
+            <h2 className="text-[0.8rem] font-extrabold uppercase tracking-[0.08em] text-[var(--color-text-primary)] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]">
+              Loan Details
+            </h2>
+          </Tooltip>
         </div>
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-6">
         <SliderInput
           label="Loan Amount"
           helperText="The total amount you plan to borrow."
@@ -97,10 +99,7 @@ export default function LoanInputs() {
         />
       </div>
 
-      <div className="py-3.5 px-4 bg-[var(--color-bg-input)] rounded-[12px] border border-[var(--color-border)] text-[0.75rem] text-[var(--color-text-muted)] leading-relaxed">
-        <span className="text-[var(--color-text-secondary)] font-bold">Reducing-balance method</span>{" "}
-        — interest charged only on outstanding principal each month.
-      </div>
+
     </div>
   );
 }

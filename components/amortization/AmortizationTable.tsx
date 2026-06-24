@@ -35,7 +35,7 @@ export default function AmortizationTable({
   }
 
   const colHeaderClass =
-    "py-3 px-3 text-right text-[0.7rem] font-bold text-[var(--color-text-muted)] whitespace-nowrap tracking-[0.05em] uppercase border-b border-[var(--color-border)] bg-[var(--color-bg-input)]";
+    "py-2 px-2 sm:py-3 sm:px-4 text-right text-[0.6rem] sm:text-[0.72rem] md:text-[0.78rem] font-bold text-[var(--color-text-muted)] whitespace-nowrap tracking-[0.05em] uppercase border-b border-[var(--color-border)] bg-[var(--color-bg-input)]";
 
   return (
     <div className="flex flex-col gap-0">
@@ -43,7 +43,7 @@ export default function AmortizationTable({
         <table className="w-full border-collapse text-[0.82rem]">
           <thead>
             <tr>
-              <th className={`${colHeaderClass} text-center px-3 rounded-tl-2xl`}>
+              <th className="py-2 px-2 sm:py-3 sm:px-4 text-center text-[0.6rem] sm:text-[0.72rem] md:text-[0.78rem] font-bold text-[var(--color-text-muted)] whitespace-nowrap tracking-[0.05em] uppercase border-b border-[var(--color-border)] bg-[var(--color-bg-input)] rounded-tl-2xl">
                 Month
               </th>
               <th className={`${colHeaderClass} hidden sm:table-cell`}>EMI</th>
@@ -87,26 +87,33 @@ export default function AmortizationTable({
                       : "bg-transparent"
                   } hover:bg-[var(--color-bg-input-hover)]`}
                 >
-                  <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                    <span className={`text-[0.82rem] font-bold tabular-nums ${
-                      isBreakEven ? "text-[var(--color-principal)]" : "text-[var(--color-text-primary)]"
-                    }`}>
-                      {row.month}
-                    </span>
+                  <td className="py-2 px-2 sm:py-2.5 sm:px-4 text-center whitespace-nowrap">
+                    <div className="flex flex-col items-center gap-[2px]">
+                      <span className={`text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem] font-bold tabular-nums leading-none ${
+                        isBreakEven ? "text-[var(--color-principal)]" : "text-[var(--color-text-primary)]"
+                      }`}>
+                        {row.month}
+                      </span>
+                      {isBreakEven && (
+                        <span className="text-[0.58rem] font-bold text-[var(--color-principal)] leading-none">
+                          Break even
+                        </span>
+                      )}
+                    </div>
                   </td>
 
                   {/* EMI */}
-                  <td className="hidden sm:table-cell py-2.5 px-3 text-right text-[var(--color-text-muted)] font-medium tabular-nums whitespace-nowrap">
+                  <td className="hidden sm:table-cell py-2 px-2 sm:py-2.5 sm:px-4 text-right text-[var(--color-text-muted)] font-medium tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem]">
                     {formatINR(row.emi)}
                   </td>
 
                   {/* Principal */}
-                  <td className="py-2.5 px-3 text-right font-semibold text-[var(--color-principal)] tabular-nums whitespace-nowrap">
+                  <td className="py-2 px-2 sm:py-2.5 sm:px-4 text-right font-semibold text-[var(--color-principal)] tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem]">
                     {formatINR(row.principal)}
                   </td>
 
                   {/* Interest */}
-                  <td className="py-2.5 px-3 text-right font-medium text-[var(--color-interest)] tabular-nums whitespace-nowrap">
+                  <td className="py-2 px-2 sm:py-2.5 sm:px-4 text-right font-medium text-[var(--color-interest)] tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem]">
                     {formatINR(row.interest)}
                   </td>
 
@@ -122,7 +129,7 @@ export default function AmortizationTable({
                   )}
 
                   {/* Balance */}
-                  <td className={`py-2.5 pl-3 pr-4 sm:pr-5 text-right font-medium tabular-nums whitespace-nowrap ${
+                  <td className={`py-2 px-2 sm:py-2.5 sm:pl-4 pr-2 sm:pr-5 text-right font-medium tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem] ${
                     row.balance === 0
                       ? "text-[var(--color-principal)]"
                       : "text-[var(--color-text-secondary)]"

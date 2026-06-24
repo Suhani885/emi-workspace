@@ -17,10 +17,10 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
   const savedTheme = cookieStore.get("emi-theme")?.value;
-  const initialTheme = savedTheme === "light" ? "light" : "dark";
+  const initialTheme = savedTheme === "dark" ? "dark" : "light";
 
   return (
-    <html lang="en" className={initialTheme === "light" ? "light" : ""} suppressHydrationWarning>
+    <html lang="en" className={initialTheme === "dark" ? "" : "light"} suppressHydrationWarning>
       <body className="font-display">
         <AppProvider initialTheme={initialTheme}>{children}</AppProvider>
       </body>

@@ -10,18 +10,18 @@
   --color-bg-input-hover: #232534;
   --color-border: #242636;
   --color-border-bright: #30324a;
-  --color-text-primary: #e4e4f0;
-  --color-text-secondary: #9090b0;
-  --color-text-muted: #52527a;
-  --color-principal: #f07014;
-  --color-principal-hover: #d96412;
-  --color-principal-light: rgba(240, 112, 20, 0.09);
-  --color-principal-glow: rgba(240, 112, 20, 0.18);
-  --color-interest: #7678e8;
-  --color-interest-light: rgba(118, 120, 232, 0.09);
-  --color-success: #f07014;
-  --color-warning: #d4921c;
-  --color-danger: #e05050;
+  --color-text-primary: #f8f9fc;
+  --color-text-secondary: #a3a6c2;
+  --color-text-muted: #6b6e94;
+  --color-principal: #e67e33;
+  --color-principal-hover: #d16b24;
+  --color-principal-light: rgba(230, 126, 51, 0.12);
+  --color-principal-glow: rgba(230, 126, 51, 0.2);
+  --color-interest: #8284e3;
+  --color-interest-light: rgba(130, 132, 227, 0.12);
+  --color-success: #e67e33;
+  --color-warning: #db9c35;
+  --color-danger: #e35454;
   --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 

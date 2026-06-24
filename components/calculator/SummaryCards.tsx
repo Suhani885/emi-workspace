@@ -1,10 +1,11 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from "recharts";
 import { useAppContext } from "@/context/useAppContext";
 import { useEMI } from "@/hooks/useEMI";
 import { formatINR } from "@/utils/format";
 import { useState, useEffect } from "react";
+import Tooltip from "@/components/ui/Tooltip";
 
 const PRINCIPAL_COLOR = "var(--color-principal)";
 const INTEREST_COLOR = "var(--color-interest)";
@@ -61,27 +62,23 @@ export default function SummaryCards() {
   ];
 
   return (
-    <div className="glass-card p-4 sm:p-6">
-      <div className="flex items-center gap-3">
-        <div className="w-[36px] h-[36px] rounded-xl bg-[var(--color-principal-light)] flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-principal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </div>
-        <h2 className="text-lg font-bold text-[var(--color-text-primary)] tracking-tight">
+    <div className="glass-card p-3 sm:p-6">
+      <div className="flex items-center gap-2.5">
+        <div className="w-1 h-5 rounded-full bg-[var(--color-principal)]"></div>
+        <h2 className="text-[0.8rem] font-extrabold uppercase tracking-[0.08em] text-[var(--color-text-primary)]">
           Summary
         </h2>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 items-center justify-between mt-4 sm:mt-6 min-h-[260px] lg:min-h-[248px]">
-        <div className="w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] shrink-0 relative mx-auto lg:mx-0">
+      <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 items-center justify-between mt-3 sm:mt-6 min-h-[220px] lg:min-h-[248px]">
+        <div className="w-[160px] h-[160px] sm:w-[220px] sm:h-[220px] shrink-0 relative mx-auto lg:mx-0">
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
-            <span className="text-[0.65rem] sm:text-[0.75rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.1em] mb-1">
+            <span className="text-[0.58rem] sm:text-[0.75rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.1em] mb-1">
               Monthly EMI
             </span>
             <span
               key={emi.toFixed(0)}
-              className="text-[1.2rem] sm:text-[1.5rem] font-extrabold text-[var(--color-text-primary)] tracking-tight animate-count-up"
+              className="text-[1rem] sm:text-[1.5rem] font-extrabold text-[var(--color-text-primary)] tracking-tight animate-count-up"
             >
               {formatINR(emi)}
             </span>
@@ -105,7 +102,7 @@ export default function SummaryCards() {
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip content={<CustomTooltip />} />
+                <RechartsTooltip content={<CustomTooltip />} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -114,13 +111,16 @@ export default function SummaryCards() {
         <div className="flex-1 flex flex-col gap-4">
           <div className="flex flex-col items-center justify-between pb-3 border-b border-[var(--color-border)] md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="text-[0.75rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.08em] mb-1 inline-block">
-                Total Payable
-              </p>
-              <p className="text-[0.65rem] text-[var(--color-text-muted)] mb-1">
-                (Principal + Interest)
-              </p>
-              <p className="text-[1.3rem] sm:text-[1.7rem] font-extrabold text-[var(--color-text-primary)] tracking-tight whitespace-nowrap tabular-nums">
+              <Tooltip
+                content="(Principal + Interest)"
+                tipClassName="normal-case tracking-normal"
+                className="w-max mb-1"
+              >
+                <p className="text-[0.75rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.08em] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]">
+                  Total Payable
+                </p>
+              </Tooltip>
+              <p className="text-[1.1rem] sm:text-[1.7rem] font-extrabold text-[var(--color-text-primary)] tracking-tight whitespace-nowrap tabular-nums">
                 {formatINR(totalPayable)}
               </p>
             </div>
@@ -129,26 +129,32 @@ export default function SummaryCards() {
           <div className="flex flex-col gap-3.5">
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2.5">
+                <Tooltip
+                  content="Original sum borrowed"
+                  tipClassName="left-5"
+                  className="flex items-center gap-2.5 w-max"
+                >
                   <div className="w-[12px] h-[12px] rounded-[4px] bg-[var(--color-principal)] shrink-0" />
-                  <span className="text-[0.9rem] font-medium text-[var(--color-text-secondary)]">Principal Amount</span>
-                </div>
-                <span className="text-[0.7rem] text-[var(--color-text-muted)] ml-5">Original sum borrowed</span>
+                  <span className="text-[0.9rem] font-medium text-[var(--color-text-secondary)] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]">Principal Amount</span>
+                </Tooltip>
               </div>
-              <span className="text-[1rem] font-bold text-[var(--color-text-primary)]">
+              <span className="text-[0.85rem] sm:text-[1rem] font-bold text-[var(--color-text-primary)]">
                 {formatINR(amount)}
               </span>
             </div>
 
             <div className="flex items-start justify-between mt-2">
               <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2.5">
+                <Tooltip
+                  content="Extra amount paid"
+                  tipClassName="left-5"
+                  className="flex items-center gap-2.5 w-max"
+                >
                   <div className="w-[12px] h-[12px] rounded-[4px] bg-[var(--color-interest)] shrink-0" />
-                  <span className="text-[0.9rem] font-medium text-[var(--color-text-secondary)]">Total Interest</span>
-                </div>
-                <span className="text-[0.7rem] text-[var(--color-text-muted)] ml-5">Extra amount paid</span>
+                  <span className="text-[0.9rem] font-medium text-[var(--color-text-secondary)] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]">Total Interest</span>
+                </Tooltip>
               </div>
-              <span className="text-[1rem] font-bold text-[var(--color-interest)]">
+              <span className="text-[0.85rem] sm:text-[1rem] font-bold text-[var(--color-interest)]">
                 {formatINR(totalInterest)}
               </span>
             </div>

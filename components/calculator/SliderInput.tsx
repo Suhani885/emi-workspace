@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import Tooltip from "@/components/ui/Tooltip";
 
 interface SliderInputProps {
   label: string;
@@ -186,22 +187,28 @@ export default function SliderInput({
     <div className="flex flex-col gap-2.5">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col">
-          <label
-            htmlFor={inputId}
-            className="text-[0.9rem] font-bold text-[var(--color-text-primary)] tracking-[0.01em]"
-          >
-            {label}
-          </label>
-          {helperText && (
-            <p className="text-[0.7rem] text-[var(--color-text-muted)] mt-1 max-w-[200px] leading-snug">
-              {helperText}
-            </p>
+          {helperText ? (
+            <Tooltip content={helperText} className="w-max">
+              <label
+                htmlFor={inputId}
+                className="text-[0.78rem] sm:text-[0.9rem] font-bold text-[var(--color-text-primary)] tracking-[0.01em] border-b border-dashed border-[var(--color-text-muted)] pb-[1px]"
+              >
+                {label}
+              </label>
+            </Tooltip>
+          ) : (
+            <label
+              htmlFor={inputId}
+              className="text-[0.78rem] sm:text-[0.9rem] font-bold text-[var(--color-text-primary)] tracking-[0.01em] cursor-default"
+            >
+              {label}
+            </label>
           )}
         </div>
 
-        <div className="group flex items-center gap-1 bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-[12px] px-3 py-2 transition-all duration-200 focus-within:border-[var(--color-principal)] focus-within:shadow-[0_0_0_4px_var(--color-principal-light)]">
+        <div className="group flex items-center gap-1 bg-[var(--color-bg-input)] border border-[var(--color-border)] rounded-[10px] sm:rounded-[12px] px-2 sm:px-3 py-1.5 sm:py-2 transition-all duration-200 focus-within:border-[var(--color-principal)] focus-within:shadow-[0_0_0_3px_var(--color-principal-light)]">
           {prefix && (
-            <span className="text-[0.8rem] text-[var(--color-text-muted)] select-none mr-0.5">
+            <span className="text-[0.72rem] sm:text-[0.8rem] text-[var(--color-text-muted)] select-none mr-0.5">
               {prefix}
             </span>
           )}
@@ -216,11 +223,11 @@ export default function SliderInput({
             onBlur={handleNumberBlur}
             onKeyDown={handleKeyDown}
             placeholder={String(value)}
-            className="w-[72px] bg-transparent border-none outline-none text-[1rem] font-extrabold text-[var(--color-principal)] text-right font-[inherit]"
+            className="w-[58px] sm:w-[72px] bg-transparent border-none outline-none text-[0.88rem] sm:text-[1rem] font-extrabold text-[var(--color-principal)] text-right font-[inherit]"
             aria-label={label}
           />
           {showSuffix && (
-            <span className="text-[0.8rem] text-[var(--color-text-muted)] select-none ml-0.5">
+            <span className="text-[0.72rem] sm:text-[0.8rem] text-[var(--color-text-muted)] select-none ml-0.5">
               {suffix}
             </span>
           )}
@@ -258,14 +265,12 @@ export default function SliderInput({
             }}
           >
             <div
-              className="px-2.5 py-1 rounded-lg text-[0.72rem] font-bold text-white whitespace-nowrap shadow-lg"
-              style={{ background: accentColor }}
+              className="px-2.5 py-1.5 bg-[var(--color-text-primary)] text-[var(--color-bg-base)] rounded-lg text-[0.75rem] font-medium whitespace-nowrap shadow-lg"
             >
               {bubbleLabel}
             </div>
             <div
-              className="w-0 h-0 mx-auto border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent"
-              style={{ borderTopColor: accentColor }}
+              className="w-0 h-0 mx-auto border-l-[5px] border-r-[5px] border-t-[5px] border-l-transparent border-r-transparent border-t-[var(--color-text-primary)]"
             />
           </div>
         )}
@@ -290,10 +295,10 @@ export default function SliderInput({
       </div>
 
       <div className="flex justify-between mt-1">
-        <span className="text-[0.75rem] font-medium text-[var(--color-text-muted)]">
+        <span className="text-[0.65rem] sm:text-[0.75rem] font-medium text-[var(--color-text-muted)]">
           {minLabel ?? String(min)}
         </span>
-        <span className="text-[0.75rem] font-medium text-[var(--color-text-muted)]">
+        <span className="text-[0.65rem] sm:text-[0.75rem] font-medium text-[var(--color-text-muted)]">
           {maxLabel ?? String(max)}
         </span>
       </div>
