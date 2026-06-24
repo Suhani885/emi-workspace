@@ -1,20 +1,37 @@
+let memoryTabId: string | null = null;
+let memoryJoinedAt: number | null = null;
+
 export function generateTabId(): { tabId: string; joinedAt: number } {
+  if (memoryTabId && memoryJoinedAt) {
+    return { tabId: memoryTabId, joinedAt: memoryJoinedAt };
+  }
+
   if (typeof window !== "undefined" && window.sessionStorage) {
     const existingId = sessionStorage.getItem("emi_tabId");
     const existingJoinedAt = sessionStorage.getItem("emi_joinedAt");
+
     if (existingId && existingJoinedAt) {
-      return { tabId: existingId, joinedAt: parseInt(existingJoinedAt, 10) };
+      memoryTabId = existingId;
+      memoryJoinedAt = parseInt(existingJoinedAt, 10);
+      sessionStorage.removeItem("emi_tabId");
+      sessionStorage.removeItem("emi_joinedAt");
+
+      return { tabId: memoryTabId, joinedAt: memoryJoinedAt };
     }
   }
 
   const suffix = Math.random().toString(36).slice(2, 5).toUpperCase();
-  const tabId = `Tab ${suffix}`;
-  const joinedAt = Date.now();
+  memoryTabId = `Tab ${suffix}`;
+  memoryJoinedAt = Date.now();
 
-  if (typeof window !== "undefined" && window.sessionStorage) {
-    sessionStorage.setItem("emi_tabId", tabId);
-    sessionStorage.setItem("emi_joinedAt", joinedAt.toString());
-  }
+  return { tabId: memoryTabId, joinedAt: memoryJoinedAt };
+}
 
-  return { tabId, joinedAt };
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    if (memoryTabId && memoryJoinedAt && window.sessionStorage) {
+      sessionStorage.setItem("emi_tabId", memoryTabId);
+      sessionStorage.setItem("emi_joinedAt", memoryJoinedAt.toString());
+    }
+  });
 }
