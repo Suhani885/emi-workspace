@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EMI Calculator Workspace
 
-## Getting Started
+A state-of-the-art, interactive, and highly responsive web application built to calculate EMIs, map amortization schedules, evaluate the impact of prepayments, and offer seamless real-time session synchronization across multiple browser tabs. 
 
-First, run the development server:
+Designed with a premium UI/UX, the EMI Workspace brings institutional-grade loan analytics to a beautiful, consumer-friendly interface.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **📊 Dynamic EMI Calculation**: Instantly computes Monthly EMI, Total Interest Payable, and Total Amount Payable based on principal, interest rate, and tenure.
+- **📅 Interactive Prepayment Planner**: Schedule prepayments for any specific month. Visualize live metrics such as **Interest Saved** and **Tenure Reduced** (months saved).
+- **⚖️ Scenario Comparison**: Compare multiple loan configurations (e.g., varying interest rates or tenures) side-by-side to make the best financial decisions.
+- **📈 Sensitivity Analysis**: View a detailed grid mapping out monthly EMI variations against dynamic interest rates (vertical axis) and loan tenures (horizontal axis).
+- **🔄 Real-time Multi-Tab Sync**: Leveraging the native Web `BroadcastChannel` API, all input values, active tabs, themes, and prepayments are instantly synced across all open browser tabs in real-time.
+- **↩️ Shared Undo History**: Confidently experiment with numbers. The app tracks state history for global undo action (via header buttons or standard `Ctrl+Z` shortcut).
+- **🔗 Shareable Links**: The current state can be encoded into the URL, allowing you to copy a link and share your exact EMI scenario and prepayment schedule with others.
+- **🌗 Premium Dark/Light Mode**: Smooth theme transitions built natively into the app, featuring curated colors and micro-animations for an elevated user experience.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🛠️ Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Framework**: [Next.js](https://nextjs.org/) 16 (App Router)
+- **Library**: [React](https://react.dev/) 19
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Charts/Visualizations**: [Recharts](https://recharts.org/)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Getting Started
 
-## Deploy on Vercel
+Follow these instructions to run the project on your local machine.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) (v18 or higher) and `npm`, installed.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Suhani885/emi-workspace.git
+   cd emi-workspace
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open the App:**
+   Visit [http://localhost:3000](http://localhost:3000) in your browser. Open the same URL in a second tab to experience the real-time Broadcast API synchronization!
+
+---
+
+## Architecture & State Management
+
+### Real-Time Sync (`BroadcastChannel`)
+This project implements a custom real-time state synchronization system using the browser's native **BroadcastChannel API**. 
+
+Instead of relying on WebSockets or a backend database, state changes are broadcasted locally across all tabs of the same origin.
+- **`useBroadcast.ts`**: Manages the channel connection and payload dispatching.
+- **`usePresence.ts`**: Tracks which tabs are active, assigning a "leader" tab to handle source-of-truth actions.
+- **`useUrlState.ts`**: Hydrates state from and syncs state to the URL search parameters, enabling easy deep-linking.
+
+### Amortization & Financial Logic
+Complex financial calculations are extracted into custom, heavily tested hooks (`useEMI.ts`, `useAmortization.ts`). They handle compounding interest, mid-schedule prepayments, and recalculate break-even points natively.
+
