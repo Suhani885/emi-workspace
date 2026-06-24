@@ -165,6 +165,13 @@ export default function PrepaymentPlanner() {
     [originalResult.schedule]
   );
 
+  const totalPrepayments = useMemo(
+    () => prepayments.reduce((sum, pp) => sum + pp.amount, 0),
+    [prepayments]
+  );
+
+  const isPrepaymentExceeded = totalPrepayments > loan.amount;
+
   const validate = useCallback((): boolean => {
     const errs: Partial<PrepaymentFormState> = {};
     const month = parseInt(form.month, 10);
@@ -178,11 +185,18 @@ export default function PrepaymentPlanner() {
 
     if (!form.amount || isNaN(amount) || amount <= 0) {
       errs.amount = "Enter a valid amount (> 0)";
+    } else {
+      const otherPrepaymentsSum = prepayments
+        .filter((pp) => pp.id !== editingId)
+        .reduce((sum, pp) => sum + pp.amount, 0);
+      if (otherPrepaymentsSum + amount > loan.amount) {
+        errs.amount = `Total prepayments cannot exceed loan amount of ${formatINR(loan.amount)}`;
+      }
     }
 
     setErrors(errs);
     return Object.keys(errs).length === 0;
-  }, [form, loan.tenure]);
+  }, [form, loan.tenure, loan.amount, prepayments, editingId]);
 
   const handleSubmit = useCallback(() => {
     if (!validate()) return;
@@ -280,6 +294,21 @@ export default function PrepaymentPlanner() {
             </Tooltip>
           </div>
         </div>
+
+        {isPrepaymentExceeded && (
+          <div className="flex gap-2.5 p-3.5 rounded-xl bg-[rgba(227,84,84,0.08)] border border-[rgba(227,84,84,0.2)] text-[var(--color-danger)] text-[0.78rem] font-semibold leading-relaxed animate-fade-in">
+            <svg className="shrink-0 w-4 h-4 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div>
+              <p className="font-bold mb-0.5">Prepayment Limit Exceeded</p>
+              <p className="opacity-90 font-medium">
+                Total scheduled prepayments ({formatINR(totalPrepayments)}) exceed the loan amount ({formatINR(loan.amount)}).
+                Please adjust your loan amount or edit/remove scheduled prepayments.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-5">
           <div className="flex flex-col gap-4">

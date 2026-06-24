@@ -223,7 +223,7 @@ export default function SliderInput({
             onBlur={handleNumberBlur}
             onKeyDown={handleKeyDown}
             placeholder={String(value)}
-            className="w-[58px] sm:w-[72px] bg-transparent border-none outline-none text-[0.88rem] sm:text-[1rem] font-extrabold text-[var(--color-principal)] text-right font-[inherit]"
+            className="w-[82px] sm:w-[98px] bg-transparent border-none outline-none text-[0.88rem] sm:text-[1rem] font-extrabold text-[var(--color-principal)] text-right font-[inherit]"
             aria-label={label}
           />
           {showSuffix && (
