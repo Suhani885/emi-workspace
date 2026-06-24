@@ -72,7 +72,7 @@ function PrepaymentImpactPanel({
   const savingsBarWidth = Math.min(100, savingsPercent);
 
   return (
-    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-input)] p-5 flex flex-col gap-4 h-full min-h-[280px]">
+    <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-input)] p-5 flex flex-col gap-4 min-h-[280px] h-fit md:self-start w-full">
       <div className="flex items-center justify-between gap-2 min-h-[22px]">
         <p className="text-[0.7rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.07em]">
           Prepayment Impact
@@ -281,7 +281,7 @@ export default function PrepaymentPlanner() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-5">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <p className="text-[0.8rem] font-bold text-[var(--color-text-secondary)]">
@@ -358,7 +358,7 @@ export default function PrepaymentPlanner() {
                 <p className="text-[0.72rem] font-bold text-[var(--color-text-muted)] uppercase tracking-[0.05em]">
                   Scheduled ({groupedPrepayments.length} month{groupedPrepayments.length !== 1 ? "s" : ""}, {sortedPrepayments.length} payment{sortedPrepayments.length !== 1 ? "s" : ""})
                 </p>
-                <div className="flex flex-col gap-1.5 max-h-[220px] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-1.5 max-h-[168px] overflow-y-auto pr-1">
                   {groupedPrepayments.map(({ month, total, items }) => {
                     const isGroupEditing = items.some((pp) => editingId === pp.id);
                     return (

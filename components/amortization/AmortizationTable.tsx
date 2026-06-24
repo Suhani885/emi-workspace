@@ -102,22 +102,18 @@ export default function AmortizationTable({
                     </div>
                   </td>
 
-                  {/* EMI */}
                   <td className="hidden sm:table-cell py-2 px-2 sm:py-2.5 sm:px-4 text-right text-[var(--color-text-muted)] font-medium tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem]">
                     {formatINR(row.emi)}
                   </td>
 
-                  {/* Principal */}
                   <td className="py-2 px-2 sm:py-2.5 sm:px-4 text-right font-semibold text-[var(--color-principal)] tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem]">
                     {formatINR(row.principal)}
                   </td>
 
-                  {/* Interest */}
                   <td className="py-2 px-2 sm:py-2.5 sm:px-4 text-right font-medium text-[var(--color-interest)] tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem]">
                     {formatINR(row.interest)}
                   </td>
 
-                  {/* Prepayment */}
                   {showPrepayment && (
                     <td className="hidden md:table-cell py-2.5 px-3 text-right font-semibold tabular-nums whitespace-nowrap">
                       {row.prepayment > 0 ? (
@@ -128,7 +124,6 @@ export default function AmortizationTable({
                     </td>
                   )}
 
-                  {/* Balance */}
                   <td className={`py-2 px-2 sm:py-2.5 sm:pl-4 pr-2 sm:pr-5 text-right font-medium tabular-nums whitespace-nowrap text-[0.72rem] sm:text-[0.85rem] md:text-[0.9rem] ${
                     row.balance === 0
                       ? "text-[var(--color-principal)]"

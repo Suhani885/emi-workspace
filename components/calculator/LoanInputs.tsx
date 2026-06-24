@@ -37,7 +37,7 @@ export default function LoanInputs() {
   );
 
   return (
-    <div className="glass-card p-3 sm:p-6 flex flex-col gap-4 sm:gap-6 relative overflow-hidden">
+    <div className="glass-card p-3 sm:p-6 flex flex-col gap-4 sm:gap-6 relative overflow-hidden h-fit md:self-start w-full">
       <div>
         <div className="flex items-center gap-2.5 mb-2">
           <div className="w-1 h-5 rounded-full bg-[var(--color-principal)]"></div>

@@ -30,16 +30,21 @@ export function AppProvider({ children, initialTheme }: AppProviderProps) {
   const stateRef = useRef(state);
   stateRef.current = state;
 
+  const isLeaderRef = useRef(isLeader);
+  isLeaderRef.current = isLeader;
+
   useEffect(() => {
     if (!channelRef.current || !tabId) return;
 
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "LEADER_REQUEST" && event.data.tabId !== tabId) {
-        channelRef.current?.postMessage({
-          type: "STATE_UPDATE",
-          tabId,
-          payload: stateRef.current,
-        });
+        if (isLeaderRef.current) {
+          channelRef.current?.postMessage({
+            type: "STATE_UPDATE",
+            tabId,
+            payload: stateRef.current,
+          });
+        }
       }
     };
 

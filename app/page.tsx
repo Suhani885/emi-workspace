@@ -216,9 +216,9 @@ export default function Page() {
 
         {mode === "single" && (
           <div className="animate-fade-slide-up">
-            <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] lg:grid-cols-[400px_1fr] gap-3 sm:gap-6 mb-3 sm:mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-[320px_minmax(0,1fr)] lg:grid-cols-[400px_minmax(0,1fr)] gap-3 sm:gap-6 mb-3 sm:mb-6">
               <LoanInputs />
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 w-full min-w-0">
                 <SummaryCards />
                 <SensitivityTable />
               </div>

@@ -56,12 +56,14 @@ export function useBroadcast(
       scenarios: state.scenarios,
       prepayments: state.prepayments,
       theme: state.theme,
+      past: state.past,
+      lastActionTime: state.lastActionTime,
     };
 
     channelRef.current?.postMessage({
       type: "STATE_UPDATE",
       tabId,
-      payload: baseState as any,
+      payload: baseState,
     });
   }, [state, tabId]);
 

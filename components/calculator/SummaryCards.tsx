@@ -56,6 +56,12 @@ export default function SummaryCards() {
   const { emi, totalInterest, totalPayable, principalPercent, interestPercent } =
     useEMI(amount, rate, tenure);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(t);
+  }, []);
+
   const donutData = [
     { name: "Principal", value: amount, color: PRINCIPAL_COLOR },
     { name: "Interest", value: totalInterest, color: INTEREST_COLOR },
@@ -84,27 +90,38 @@ export default function SummaryCards() {
             </span>
           </div>
           <div className="absolute inset-0 z-10 min-w-0 min-h-0">
-            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
-              <PieChart>
-                <Pie
-                  data={donutData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius="62%"
-                  outerRadius="88%"
-                  paddingAngle={3}
-                  dataKey="value"
-                  startAngle={90}
-                  endAngle={-270}
-                  strokeWidth={0}
-                >
-                  {donutData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <RechartsTooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
+            {mounted ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                <PieChart>
+                  <Pie
+                    data={donutData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="62%"
+                    outerRadius="88%"
+                    paddingAngle={3}
+                    dataKey="value"
+                    startAngle={90}
+                    endAngle={-270}
+                    strokeWidth={0}
+                    isAnimationActive={true}
+                    animationDuration={500}
+                    animationEasing="ease-out"
+                  >
+                    {donutData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip content={<CustomTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <svg width="100%" height="100%" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="37.5" fill="none" stroke="var(--color-bg-input)" strokeWidth="13" />
+                </svg>
+              </div>
+            )}
           </div>
         </div>
 
